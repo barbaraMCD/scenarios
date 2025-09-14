@@ -1,4 +1,4 @@
-import Navigation from './Navigation'
+import Navigation from '../organisms/Navigation.tsx'
 import type {ReactNode} from "react";
 
 interface TemplatePageProps {

@@ -1,4 +1,4 @@
-import TemplatePage from "@/components/TemplatePage.tsx";
+import TemplatePage from "@/components/templates/TemplatePage.tsx";
 
 const GraphPage = () => {
 

@@ -1,9 +1,9 @@
 "use client"
 
 import { NavLink } from "react-router-dom"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button.tsx"
 import { BarChart3, LayoutDashboard, Download, Upload } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils.ts"
 
 interface NavigationProps {
     onImport?: () => void

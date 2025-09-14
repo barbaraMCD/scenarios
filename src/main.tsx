@@ -4,12 +4,14 @@ import './index.css'
 import App from './App.tsx'
 import {BrowserRouter, Route, Routes} from "react-router";
 import GraphPage from "@/screens/GraphPage.tsx";
+import ScenarioPage from "@/screens/ScenarioPage.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
       <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} />
+              <Route path="/scenario/:scenarioId" element={<ScenarioPage />} />
             <Route path="/graphs" element={<GraphPage />} />
           </Routes>
       </BrowserRouter>
