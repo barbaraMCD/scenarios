@@ -1,13 +1,13 @@
-    import { Checkbox } from '@/components/ui/checkbox';
-    import { useState } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
+import {useState} from "react";
 
-    interface CheckBoxStepProps {
-        stepType: 'sms' | 'email' | 'custom';
-        checked: boolean;
-        onCheckedChange: (checked: boolean) => void;
-        onNextChange?: (stepType: string, nextStep: string) => void;
-        availableSteps: string[];
-    }
+interface CheckBoxStepProps {
+    stepType: 'sms' | 'email' | 'custom';
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    onNextChange?: (stepType: string, nextStep: string) => void;
+    availableSteps: string[];
+}
 
     const CheckBoxStep = ({ stepType, checked, onCheckedChange, onNextChange, availableSteps }: CheckBoxStepProps) => {
         const [nextStep, setNextStep] = useState('');
@@ -19,7 +19,6 @@
 
         const handleNextChange = (value: string) => {
             setNextStep(value);
-            console.log("value", value);
             if (onNextChange) {
                 onNextChange(stepType, value);
             }
@@ -36,26 +35,26 @@
                     <label htmlFor={stepType} className="font-medium">{stepType.toUpperCase()}</label>
                 </div>
 
-                {checked && (
-                    <div className="ml-6 space-y-2">
-                        <h5 className="font-medium mb-2">Prochaine étape :</h5>
-                        {getAvailableOptions().map(option => (
-                            <div key={`nextStep-${option}`} className="flex items-center space-x-2 mb-1">
-                                <input
-                                    type="radio"
-                                    id={`${stepType}-nextStep-${option}`}
-                                    name={`${stepType}-nextStep`}
-                                    value={option}
-                                    checked={nextStep === option}
-                                    onChange={(e) => handleNextChange(e.target.value)}
-                                />
-                                <label htmlFor={`${stepType}-nextStep-${option}`}>{option}</label>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-        );
-    };
+            {checked && (
+                <div className="ml-6 space-y-2">
+                    <h5 className="font-medium mb-2">Prochaine étape :</h5>
+                    {getAvailableOptions().map(option => (
+                        <div key={`next-${option}`} className="flex items-center space-x-2 mb-1">
+                            <input
+                                type="radio"
+                                id={`${stepType}-next-${option}`}
+                                name={`${stepType}-next`}
+                                value={option}
+                                checked={nextStep === option}
+                                onChange={(e) => handleNextChange(e.target.value)}
+                            />
+                            <label htmlFor={`${stepType}-next-${option}`}>{option}</label>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
-    export default CheckBoxStep;
+export default CheckBoxStep;

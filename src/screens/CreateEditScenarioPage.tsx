@@ -44,9 +44,6 @@
 
 
         const handleNextChange = (stepType: string, nextStep: string) => {
-
-            console.log("next in scenario page", nextStep)
-            console.log("type in scenario page", stepType)
             setScenario(prev => ({
                 ...prev,
                 steps: prev.steps.map(step =>
@@ -60,23 +57,15 @@
         const handleSave = () => {
             if (!scenario.name || scenario.steps.length === 0) return;
 
-            // On créé un tableau des steps
             const completeSteps = [...scenario.steps];
 
-            console.log("complete step", completeSteps);
-
             scenario.steps.forEach(step => {
-                console.log("scenario step", step);
                 if (step.nextStep && step.nextStep !== 'end') {
-                    console.log("y'a un nextStep");
                     const existing = completeSteps.find(
                         s => s.dependsOn === step.name && s.name === step.nextStep
                     );
-                    console.log("step qui n'a pas les meme dépendances et le meme nom", existing);
                     if (!existing && ['sms', 'email', 'custom'].includes(step.nextStep)) {
-                        console.log("le nextstep n'existe pas et est du bon type");
                         const base = scenario.steps.find(s => s.name === step.nextStep && !s.dependsOn);
-                        console.log("je sais pas");
                         completeSteps.push({
                             id: Date.now() + Math.random(),
                             name: step.nextStep as 'sms' | 'email' | 'custom',
@@ -136,21 +125,21 @@
                         stepType="sms"
                         checked={isStepSelected('sms')}
                         onCheckedChange={(checked) => handleCheckboxChange('sms', checked)}
-                        onNextChange={(nextStep) => handleNextChange('sms', nextStep)}
+                        onNextChange={handleNextChange}
                         availableSteps={availableSteps}
                     />
                     <CheckBoxStep
                         stepType="email"
                         checked={isStepSelected('email')}
                         onCheckedChange={(checked) => handleCheckboxChange('email', checked)}
-                        onNextChange={(nextStep) => handleNextChange('email', nextStep)}
+                        onNextChange={handleNextChange}
                         availableSteps={availableSteps}
                     />
                     <CheckBoxStep
                         stepType="custom"
                         checked={isStepSelected('custom')}
                         onCheckedChange={(checked) => handleCheckboxChange('custom', checked)}
-                        onNextChange={(nextStep) => handleNextChange('custom', nextStep)}
+                        onNextChange={handleNextChange}
                         availableSteps={availableSteps}
                     />
                 </div>

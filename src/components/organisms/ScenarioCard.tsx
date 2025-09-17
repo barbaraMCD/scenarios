@@ -26,10 +26,7 @@ const ScenarioCard = ({scenario}: ScenarioCardProps) => {
             </CardHeader>
             <CardContent>
                 <div className="flex items-center justify-between mb-2">
-                    <p>Etapes : </p>
-                    {scenario?.steps.map((step) => (
-                        <span className="ml-2" key={step.id}> {step.name}</span>
-                    ))}
+                    <p> {scenario?.steps.length} Etapes </p>
                 </div>
 
                 <div className="flex space-x-2">
