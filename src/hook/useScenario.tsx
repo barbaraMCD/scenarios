@@ -4,7 +4,7 @@ import type { IScenario } from '@/types/types';
 
 interface ScenarioStore {
     scenarios: IScenario[];
-    addScenario: (scenario: Omit<IScenario, 'id'>) => void;
+    addScenario: (scenario: IScenario) => void;
     removeScenario: (id: number) => void;
     updateScenario: (id: number, updates: Partial<IScenario>) => void;
 }
@@ -12,29 +12,12 @@ interface ScenarioStore {
 export const useScenario = create<ScenarioStore>()(
     persist(
         (set) => ({
-            scenarios: [
-                {
-                    id: 1,
-                    name: "Campagne Email Marketing",
-                    steps: [
-                        {
-                            id: 1,
-                            name: "sms",
-                            successTransition: "end",
-                            failureTransition: "email"
-                        }
-                    ],
-                }
-            ],
+            scenarios: [],
 
             addScenario: (scenarioData) =>
                 set((state) => ({
                     scenarios: [
-                        ...state.scenarios,
-                        {
-                            ...scenarioData,
-                            id: Math.max(...state.scenarios.map(s => s.id), 0) + 1,
-                        },
+                        ...state.scenarios, scenarioData
                     ],
                 })),
 

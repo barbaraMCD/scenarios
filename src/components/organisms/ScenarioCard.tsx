@@ -1,9 +1,8 @@
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Edit, MessageSquare, Trash2} from "lucide-react";
+import {MessageSquare, Trash2} from "lucide-react";
 import type {IScenario} from "@/types/types.ts";
 import {useScenario} from "@/hook/useScenario.tsx";
-import {Link} from "react-router";
 
 interface ScenarioCardProps {
     scenario: IScenario;
@@ -14,7 +13,7 @@ const ScenarioCard = ({scenario}: ScenarioCardProps) => {
     const { removeScenario } = useScenario();
 
     return (
-        <Card key={scenario.id} className="hover:shadow-lg transition-shadow duration-200">
+        <Card key={scenario.id} className="hover:shadow-lg transition-shadow duration-200 w-full">
             <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
@@ -29,12 +28,9 @@ const ScenarioCard = ({scenario}: ScenarioCardProps) => {
                 </div>
 
                 <div className="flex space-x-2">
-                    <Link to={`/scenario/${scenario.id}`}>
-                        <Button size="sm" className="flex-1">
-                            <Edit className="w-4 h-4 mr-1" />
-                            Modifier
-                        </Button>
-                    </Link>
+                    <Button size="sm" onClick={() => {}}>
+                        <p> Modifier </p>
+                    </Button>
                     <Button variant="destructive" size="sm" onClick={() => {
                         if (window.confirm(`Êtes-vous sûr de vouloir supprimer le scénario "${scenario.name}" ?`)) {
                             removeScenario(scenario.id);
