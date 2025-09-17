@@ -21,15 +21,25 @@ const DashboardPage = () => {
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Mes Scénarios</h2>
                 <p className="text-gray-600">Gérez vos campagnes marketing et leurs simulations</p>
             </div>
-            <div className="flex justify-between p-4">
+            <div className="flex justify-center gap-2 p-4">
                 {scenarios.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6">
-                        {scenarios.map((scenario) => (
-                            <ScenarioCard key={scenario.id} scenario={scenario} />
-                        ))}
+                    <div className="flex flex-col gap-6 w-1/2">
+                        <div className="flex flex-row gap-6">
+                            {scenarios.map((scenario) => (
+                                <ScenarioCard key={scenario.id} scenario={scenario} />
+                            ))}
+                        </div>
+                        <Button
+                            onClick={() => navigate('/scenario/create')}
+                            size="sm"
+                            className="w-1/4 self-center"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Créer un scénario
+                        </Button>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
+                    <div className="text-center py-12 w-1/2">
                         <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                             <Settings className="w-12 h-12 text-gray-400" />
                         </div>
@@ -43,7 +53,7 @@ const DashboardPage = () => {
                     </div>
                 )}
 
-                <div className="flex flex-col gap-2 flex-1 justify-center items-center p-2">
+                <div className="flex flex-col w-1/2 gap-2 justify-center items-center p-2">
                     <Select
                         value={selectedScenario}
                         onValueChange={(value) => setSelectedScenario(value)}

@@ -3,6 +3,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {MessageSquare, Trash2} from "lucide-react";
 import type {IScenario} from "@/types/types.ts";
 import {useScenario} from "@/hook/useScenario.tsx";
+import {useNavigate} from "react-router";
 
 interface ScenarioCardProps {
     scenario: IScenario;
@@ -11,9 +12,10 @@ interface ScenarioCardProps {
 const ScenarioCard = ({scenario}: ScenarioCardProps) => {
 
     const { removeScenario } = useScenario();
+    const navigate = useNavigate();
 
     return (
-        <Card key={scenario.id} className="hover:shadow-lg transition-shadow duration-200 w-full">
+        <Card key={scenario.id} className="hover:shadow-lg transition-shadow duration-200 w-fit">
             <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
@@ -23,12 +25,15 @@ const ScenarioCard = ({scenario}: ScenarioCardProps) => {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                    <span>{scenario.steps.length} étapes</span>
+                <div className="flex items-center justify-between mb-2">
+                    <p>Etapes : </p>
+                    {scenario?.steps.map((step) => (
+                        <span className="ml-2" key={step.id}> {step.name}</span>
+                    ))}
                 </div>
 
                 <div className="flex space-x-2">
-                    <Button size="sm" onClick={() => {}}>
+                    <Button size="sm" onClick={() => navigate(`/scenario/edit/${scenario.id}`)}>
                         <p> Modifier </p>
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => {

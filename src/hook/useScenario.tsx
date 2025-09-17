@@ -7,11 +7,12 @@ interface ScenarioStore {
     addScenario: (scenario: IScenario) => void;
     removeScenario: (id: number) => void;
     updateScenario: (id: number, updates: Partial<IScenario>) => void;
+    getScenarioById: (id: number) => IScenario | undefined;
 }
 
 export const useScenario = create<ScenarioStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             scenarios: [],
 
             addScenario: (scenarioData) =>
@@ -32,6 +33,10 @@ export const useScenario = create<ScenarioStore>()(
                         scenario.id === id ? { ...scenario, ...updates } : scenario
                     ),
                 })),
+            getScenarioById: (id: number) => {
+                const state = get();
+                return state.scenarios.find(scenario => scenario.id === id);
+            }
         }),
         {
             name: 'scenarios-storage',

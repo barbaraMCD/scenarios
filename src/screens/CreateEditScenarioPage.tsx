@@ -1,23 +1,26 @@
 import { useState } from 'react';
 import { useScenario } from '@/hook/useScenario';
-import { useNavigate } from 'react-router';
+import {useNavigate, useParams} from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type {IScenario, IStep} from '@/types/types';
 import CheckBoxStep from "@/components/organisms/CheckBoxStep.tsx";
 
-const CreateScenarioPage = () => {
-    const { addScenario, scenarios } = useScenario();
+const CreateEditScenarioPage = () => {
+    const { getScenarioById, addScenario, updateScenario } = useScenario();
+    const { id } = useParams();
+    const isEditing = !!id;
     const navigate = useNavigate();
-    const [scenario, setScenario] = useState<IScenario>({
-        id: 0,
-        name: '',
-        steps: []
+    const [scenario, setScenario] = useState<IScenario>(() => {
+        if (isEditing && id) {
+            return getScenarioById(parseInt(id))!
+        }
+        return {
+            id: Date.now(),
+            name: '',
+            steps: []
+        };
     });
-
-    console.log("scenario", scenario);
-
-    console.log("scenario dans state", scenarios[0]);
 
     const handleCheckboxChange = (stepType: 'sms' | 'email' | 'custom', checked: boolean) => {
         if (checked) {
@@ -56,7 +59,12 @@ const CreateScenarioPage = () => {
 
     const handleSave = () => {
         if (!scenario.name || scenario.steps.length === 0) return;
-        addScenario(scenario);
+
+        if (isEditing) {
+            updateScenario(parseInt(id), scenario);
+        } else {
+            addScenario(scenario);
+        }
         navigate('/');
     };
 
@@ -95,14 +103,11 @@ const CreateScenarioPage = () => {
                 />
             </div>
 
-            <Button
-                onClick={handleSave}
-                disabled={!scenario.name || scenario.steps.length === 0}
-            >
-                Créer
+            <Button onClick={handleSave} disabled={!scenario.name || scenario.steps.length === 0}>
+                {isEditing ? 'Modifier' : 'Créer'}
             </Button>
         </div>
     );
 };
 
-export default CreateScenarioPage;
+export default CreateEditScenarioPage;
