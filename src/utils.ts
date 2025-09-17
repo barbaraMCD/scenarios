@@ -1,27 +1,79 @@
-import type {IScenario, IStep} from "@/types/types.ts";
+        import type {IScenario} from "@/types/types.ts";
 
-export const getCoreRules = (stepType: string) => {
-    switch (stepType) {
-        case 'sms':
-            return 'success';
-        case 'email':
-            return Math.random() < 0.5 ? 'success' : 'failure';
-        case 'custom':
-            return 'failure';
-    }
-};
+        export const getCoreRules = (stepType: string) => {
+            switch (stepType) {
+                case 'sms':
+                    return 'success';
+                case 'email':
+                    return Math.random() < 0.5 ? 'success' : 'failure';
+                case 'custom':
+                    return 'failure';
+            }
+        };
 
-export const addStep = (scenario: IScenario) => {
-    if (!scenario || scenario?.steps.length >= 3) return
+        export interface IExecutionLog {
+            step: string,
+            result: string,
+            timestamp: number,
+            dependsOn: string | null | undefined
+        }
 
-    const newStep: IStep = {
-        id: Math.max(...scenario.steps.map(s => s.id), 0) + 1,
-        name: "",
-        successTransition: ""
-    }
+        export const simulateScenario = (scenario:IScenario) => {
+            const executionLog: IExecutionLog[] = [];
+            let executionCount = 0;
+            const MAX_EXECUTIONS = 10;
 
-    return {
-        ...scenario,
-        steps: [...scenario.steps, newStep]
-    }
-}
+            const findStepByName = (name: string) => {
+                return scenario.steps.find(step => step.name === name);
+            };
+
+            const executeStep = async (stepName: string, delay = 0): Promise<void> => {
+                if (++executionCount > MAX_EXECUTIONS) {
+                    executionLog.push({
+                        step: 'error',
+                        result: 'Max executions reached',
+                        timestamp: Date.now(),
+                        dependsOn: null
+                    });
+                    return;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+
+                if (stepName === 'start') {
+                    const independentSteps = scenario.steps.filter(
+                        s => !s.dependsOn && s.name !== 'start' && s.name !== 'end'
+                    );
+                    await Promise.all(independentSteps.map(s =>
+                        executeStep(s.name, Math.random() * 1000)
+                    ));
+                    return;
+                }
+
+                if (stepName === 'end') {
+                    executionLog.push({ step: 'end', result: 'completed', timestamp: Date.now(), dependsOn: null });
+                    return;
+                }
+
+                const step = findStepByName(stepName);
+                if (!step) return;
+
+                const result = getCoreRules(stepName);
+                if (!result) return;
+
+                executionLog.push({
+                    step: stepName,
+                    result,
+                    timestamp: Date.now(),
+                    dependsOn: step.dependsOn
+                });
+
+                if (result === 'success' && step.nextStep) {
+                    await executeStep(step.nextStep, Math.random() * 1000);
+                }
+            };
+
+            return executeStep('start').then(() => executionLog);
+        };
+
+

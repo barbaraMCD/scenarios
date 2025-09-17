@@ -1,9 +1,10 @@
 export interface IStep {
     id: number;
-    name: string;
-    successTransition: string;
-    failureTransition: string;
+    name: 'sms' | 'email' | 'custom' | 'start' | 'end';
+    nextStep?: string | null;
+    dependsOn?: string | null | undefined;
 }
+
 
 export interface IScenario {
     id: number;

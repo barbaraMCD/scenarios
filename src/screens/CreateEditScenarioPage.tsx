@@ -1,113 +1,165 @@
-import { useState } from 'react';
-import { useScenario } from '@/hook/useScenario';
-import {useNavigate, useParams} from 'react-router';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import type {IScenario, IStep} from '@/types/types';
-import CheckBoxStep from "@/components/organisms/CheckBoxStep.tsx";
+    import { useState } from 'react';
+    import { useScenario } from '@/hook/useScenario';
+    import {useNavigate, useParams} from 'react-router';
+    import { Button } from '@/components/ui/button';
+    import { Input } from '@/components/ui/input';
+    import type {IScenario, IStep} from '@/types/types';
+    import CheckBoxStep from "@/components/organisms/CheckBoxStep.tsx";
 
-const CreateEditScenarioPage = () => {
-    const { getScenarioById, addScenario, updateScenario } = useScenario();
-    const { id } = useParams();
-    const isEditing = !!id;
-    const navigate = useNavigate();
-    const [scenario, setScenario] = useState<IScenario>(() => {
-        if (isEditing && id) {
-            return getScenarioById(parseInt(id))!
-        }
-        return {
-            id: Date.now(),
-            name: '',
-            steps: []
-        };
-    });
-
-    const handleCheckboxChange = (stepType: 'sms' | 'email' | 'custom', checked: boolean) => {
-        if (checked) {
-            const newStep: IStep = {
+    const CreateEditScenarioPage = () => {
+        const { getScenarioById, addScenario, updateScenario } = useScenario();
+        const { id } = useParams();
+        const isEditing = !!id;
+        const navigate = useNavigate();
+        const [scenario, setScenario] = useState<IScenario>(() => {
+            if (isEditing && id) {
+                return getScenarioById(parseInt(id))!
+            }
+            return {
                 id: Date.now(),
-                name: stepType,
-                successTransition: '',
-                failureTransition: ''
+                name: '',
+                steps: []
             };
-            setScenario(prev => ({
-                ...prev,
-                steps: [...prev.steps, newStep]
-            }));
-        } else {
-            setScenario(prev => ({
-                ...prev,
-                steps: prev.steps.filter(step => step.name !== stepType)
-            }));
-        }
-    };
+        });
 
-    const handleTransitionsChange = (stepType: string, transitions: { success: string, failure: string }) => {
-        setScenario(prev => ({
-            ...prev,
-            steps: prev.steps.map(step =>
-                step.name === stepType
-                    ? {
-                        ...step,
-                        successTransition: transitions.success,
-                        failureTransition: transitions.failure
+        const handleCheckboxChange = (stepType: 'sms' | 'email' | 'custom', checked: boolean) => {
+            if (checked) {
+                const newStep: IStep = {
+                    id: Date.now(),
+                    name: stepType,
+                    nextStep: null,
+                    dependsOn: null
+                };
+                setScenario(prev => ({
+                    ...prev,
+                    steps: [...prev.steps, newStep]
+                }));
+            } else {
+                setScenario(prev => ({
+                    ...prev,
+                    steps: prev.steps.filter(step => step.name !== stepType)
+                }));
+            }
+        };
+
+
+        const handleNextChange = (stepType: string, nextStep: string) => {
+
+            console.log("next in scenario page", nextStep)
+            console.log("type in scenario page", stepType)
+            setScenario(prev => ({
+                ...prev,
+                steps: prev.steps.map(step =>
+                    step.name === stepType
+                        ? { ...step, nextStep }
+                        : step
+                )
+            }));
+        };
+
+        const handleSave = () => {
+            if (!scenario.name || scenario.steps.length === 0) return;
+
+            // On créé un tableau des steps
+            const completeSteps = [...scenario.steps];
+
+            console.log("complete step", completeSteps);
+
+            scenario.steps.forEach(step => {
+                console.log("scenario step", step);
+                if (step.nextStep && step.nextStep !== 'end') {
+                    console.log("y'a un nextStep");
+                    const existing = completeSteps.find(
+                        s => s.dependsOn === step.name && s.name === step.nextStep
+                    );
+                    console.log("step qui n'a pas les meme dépendances et le meme nom", existing);
+                    if (!existing && ['sms', 'email', 'custom'].includes(step.nextStep)) {
+                        console.log("le nextstep n'existe pas et est du bon type");
+                        const base = scenario.steps.find(s => s.name === step.nextStep && !s.dependsOn);
+                        console.log("je sais pas");
+                        completeSteps.push({
+                            id: Date.now() + Math.random(),
+                            name: step.nextStep as 'sms' | 'email' | 'custom',
+                            nextStep: base?.nextStep || null,
+                            dependsOn: step.name
+                        });
+
+                        console.log(completeSteps);
                     }
-                    : step
-            )
-        }));
-    };
+                }
+            });
 
-    const handleSave = () => {
-        if (!scenario.name || scenario.steps.length === 0) return;
+            const startStep: IStep = {
+                id: Date.now(),
+                name: 'start',
+                nextStep: null,
+                dependsOn: null
+            };
 
-        if (isEditing) {
-            updateScenario(parseInt(id), scenario);
-        } else {
-            addScenario(scenario);
-        }
-        navigate('/');
-    };
+            const endStep: IStep = {
+                id: Date.now() + 1,
+                name: 'end',
+                nextStep: null,
+                dependsOn: null
+            };
 
-    const isStepSelected = (stepType: 'sms' | 'email' | 'custom') => {
-        return scenario.steps.some(step => step.name === stepType);
-    };
+            const completeScenario = {
+                ...scenario,
+                steps: [startStep, ...completeSteps, endStep]
+            };
 
-    return (
-        <div className="p-4 space-y-4">
-            <Input
-                id="scenario-name"
-                value={scenario.name}
-                onChange={(e) => setScenario(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Nom du scénario"
-            />
+            if (isEditing) {
+                updateScenario(parseInt(id), completeScenario);
+            } else {
+                addScenario(completeScenario);
+            }
+            navigate('/');
+        };
+        const isStepSelected = (stepType: 'sms' | 'email' | 'custom') => {
+            return scenario.steps.some(step => step.name === stepType);
+        };
 
-            <div className="space-y-4">
-                <h3>Choisir les étapes :</h3>
-                <CheckBoxStep
-                    stepType="sms"
-                    checked={isStepSelected('sms')}
-                    onCheckedChange={(checked) => handleCheckboxChange('sms', checked)}
-                    onTransitionsChange={handleTransitionsChange}
+        const availableSteps = scenario.steps.map(step => step.name);
+
+        return (
+            <div className="p-4 space-y-4">
+                <Input
+                    id="scenario-name"
+                    value={scenario.name}
+                    onChange={(e) => setScenario(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Nom du scénario"
                 />
-                <CheckBoxStep
-                    stepType="email"
-                    checked={isStepSelected('email')}
-                    onCheckedChange={(checked) => handleCheckboxChange('email', checked)}
-                    onTransitionsChange={handleTransitionsChange}
-                />
-                <CheckBoxStep
-                    stepType="custom"
-                    checked={isStepSelected('custom')}
-                    onCheckedChange={(checked) => handleCheckboxChange('custom', checked)}
-                    onTransitionsChange={handleTransitionsChange}
-                />
+
+                <div className="space-y-4">
+                    <h3>Choisir les étapes :</h3>
+                    <CheckBoxStep
+                        stepType="sms"
+                        checked={isStepSelected('sms')}
+                        onCheckedChange={(checked) => handleCheckboxChange('sms', checked)}
+                        onNextChange={(nextStep) => handleNextChange('sms', nextStep)}
+                        availableSteps={availableSteps}
+                    />
+                    <CheckBoxStep
+                        stepType="email"
+                        checked={isStepSelected('email')}
+                        onCheckedChange={(checked) => handleCheckboxChange('email', checked)}
+                        onNextChange={(nextStep) => handleNextChange('email', nextStep)}
+                        availableSteps={availableSteps}
+                    />
+                    <CheckBoxStep
+                        stepType="custom"
+                        checked={isStepSelected('custom')}
+                        onCheckedChange={(checked) => handleCheckboxChange('custom', checked)}
+                        onNextChange={(nextStep) => handleNextChange('custom', nextStep)}
+                        availableSteps={availableSteps}
+                    />
+                </div>
+
+                <Button onClick={handleSave} disabled={!scenario.name || scenario.steps.length === 0}>
+                    {isEditing ? 'Modifier' : 'Créer'}
+                </Button>
             </div>
+        );
+    };
 
-            <Button onClick={handleSave} disabled={!scenario.name || scenario.steps.length === 0}>
-                {isEditing ? 'Modifier' : 'Créer'}
-            </Button>
-        </div>
-    );
-};
-
-export default CreateEditScenarioPage;
+    export default CreateEditScenarioPage;
