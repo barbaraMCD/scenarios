@@ -1,9 +1,10 @@
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {MessageSquare, Trash2} from "lucide-react";
+import {MessageSquare, Trash2, Play} from "lucide-react";
 import type {IScenario} from "@/types/types.ts";
 import {useScenario} from "@/hook/useScenario.tsx";
-import {useNavigate} from "react-router";
+import { useNavigate } from 'react-router';
+
 
 interface ScenarioCardProps {
     scenario: IScenario;
@@ -30,6 +31,14 @@ const ScenarioCard = ({scenario}: ScenarioCardProps) => {
                 </div>
 
                 <div className="flex space-x-2">
+                    <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => navigate(`/simulation/${scenario.id}`)}
+                    >
+                        <Play className="w-4 h-4 mr-1" />
+                        Simuler
+                    </Button>
                     <Button size="sm" onClick={() => navigate(`/scenario/edit/${scenario.id}`)}>
                         <p> Modifier </p>
                     </Button>

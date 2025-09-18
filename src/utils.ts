@@ -1,4 +1,4 @@
-import type {IScenario, IStep} from "@/types/types.ts";
+import type {IExecutionLog, IScenario, IStep} from "@/types/types.ts";
 
 export const getCoreRules = (stepType: string) => {
     switch (stepType) {
@@ -11,15 +11,7 @@ export const getCoreRules = (stepType: string) => {
     }
 };
 
-export interface IExecutionLog {
-    id: number;
-    step: string,
-    result: string,
-    timestamp: number,
-    dependsOn: string | null | undefined
-}
-
-export const simulateScenario = (scenario:IScenario) => {
+export const simulateScenario = (scenario:IScenario, onLogUpdate?: (log: IExecutionLog[]) => void) => {
     const executionLog: IExecutionLog[] = [];
     let executionCount = 0;
     const MAX_EXECUTIONS = 10;
@@ -37,6 +29,13 @@ export const simulateScenario = (scenario:IScenario) => {
             step.name === currentStep.nextStep &&
             step.dependsOn === currentStep.name
         );
+    };
+
+    const addToLog = (entry: IExecutionLog) => {
+        executionLog.push(entry);
+        if (onLogUpdate) {
+            onLogUpdate([...executionLog]);
+        }
     };
 
     const executeStep = async (stepId: number, delay = 0): Promise<void> => {
@@ -57,7 +56,7 @@ export const simulateScenario = (scenario:IScenario) => {
         if (!step) return;
 
         if (step.name === 'start') {
-            executionLog.push({id: stepId, step: 'start', result: 'initiated', timestamp: Date.now(), dependsOn: null });
+            addToLog({id: stepId, step: 'start', result: 'initiated', timestamp: Date.now(), dependsOn: null });
             const independentSteps = scenario.steps.filter(
                 s => !s.dependsOn && s.name !== 'start' && s.name !== 'end'
             );
@@ -68,12 +67,12 @@ export const simulateScenario = (scenario:IScenario) => {
         }
 
         if (step.name === 'end') {
-            executionLog.push({id: stepId, step: 'end', result: 'completed', timestamp: Date.now(), dependsOn: null });
+            addToLog({id: stepId, step: 'end', result: 'completed', timestamp: Date.now(), dependsOn: null });
             return;
         }
 
         if (['sms', 'email', 'custom'].includes(step.name) && successfulStepTypes.has(step.name)) {
-            executionLog.push({
+            addToLog({
                 id: step.id,
                 step: step.name,
                 result: `skipped - ${step.name} already sent successfully`,
@@ -91,7 +90,7 @@ export const simulateScenario = (scenario:IScenario) => {
             successfulStepTypes.add(step.name);
         }
 
-        executionLog.push({
+        addToLog({
             id: step?.id,
             step: step?.name,
             result,

@@ -11,3 +11,17 @@ export interface IScenario {
     name: string;
     steps: IStep[];
 }
+
+export interface IExecutionLog {
+    id: number;
+    step: string,
+    result: string,
+    timestamp: number,
+    dependsOn: string | null | undefined
+}
+
+export interface ISimulationRun {
+    id: number;
+    scenarioId: number;
+    logs: IExecutionLog[];
+}
