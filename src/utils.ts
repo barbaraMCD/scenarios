@@ -11,7 +11,7 @@ export const getCoreRules = (stepType: string) => {
     }
 };
 
-export const simulateScenario = (scenario:IScenario, onLogUpdate?: (log: IExecutionLog[]) => void) => {
+export const simulateScenario = async (scenario:IScenario, onLogUpdate?: (log: IExecutionLog[]) => void) => {
     const executionLog: IExecutionLog[] = [];
     let executionCount = 0;
     const MAX_EXECUTIONS = 10;
@@ -109,4 +109,23 @@ export const simulateScenario = (scenario:IScenario, onLogUpdate?: (log: IExecut
     return executeStep(startStep.id).then(() => executionLog);
 };
 
+export const exportScenario = (scenarios: IScenario[]) => {
+    const dataToExport = {
+        scenario: scenarios,
+        exportDate: new Date().toISOString(),
+        version: "1.0"
+    };
 
+    const jsonString = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `scenarios-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+};

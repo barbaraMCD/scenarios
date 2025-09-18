@@ -8,6 +8,7 @@ interface ScenarioStore {
     removeScenario: (id: number) => void;
     updateScenario: (id: number, updates: Partial<IScenario>) => void;
     getScenarioById: (id: number) => IScenario | undefined;
+    getAllScenarios: () => IScenario[];
 }
 
 export const useScenario = create<ScenarioStore>()(
@@ -36,7 +37,8 @@ export const useScenario = create<ScenarioStore>()(
             getScenarioById: (id: number) => {
                 const state = get();
                 return state.scenarios.find(scenario => scenario.id === id);
-            }
+            },
+            getAllScenarios: () => get().scenarios
         }),
         {
             name: 'scenarios-storage',

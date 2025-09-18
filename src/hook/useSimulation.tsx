@@ -5,7 +5,6 @@ import type {IExecutionLog, ISimulationRun} from '@/types/types';
 interface SimulationStore {
     simulationRuns: ISimulationRun[];
     saveSimulationRun: (scenarioId: number, logs: IExecutionLog[]) => void;
-    getSimulationRuns: (scenarioId: number) => ISimulationRun[];
     getAllSimulationRuns: () => ISimulationRun[];
 }
 
@@ -24,10 +23,6 @@ export const useSimulation = create<SimulationStore>()(
                         }
                     ]
                 })),
-
-            getSimulationRuns: (scenarioId: number) =>
-                get().simulationRuns.filter(run => run.scenarioId === scenarioId),
-
             getAllSimulationRuns: () => get().simulationRuns,
         }),
         {

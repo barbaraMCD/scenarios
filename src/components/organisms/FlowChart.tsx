@@ -3,7 +3,6 @@ import {
     ReactFlow,
     type Node,
     type Edge,
-    Controls,
     Background,
     Position,
     BackgroundVariant
@@ -143,7 +142,6 @@ const FlowChart: React.FC<FlowChartProps> = ({ logs, scenario }) => {
                 fitView
                 fitViewOptions={{ padding: 0.2 }}
             >
-                <Controls />
                 <Background variant={BackgroundVariant.Dots} />
             </ReactFlow>
         </div>

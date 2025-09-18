@@ -2,15 +2,18 @@
 
 import { NavLink } from "react-router-dom"
 import { Button } from "@/components/ui/button.tsx"
-import { BarChart3, LayoutDashboard, Download, Upload } from "lucide-react"
+import { BarChart3, LayoutDashboard, Download } from "lucide-react"
 import { cn } from "@/lib/utils.ts"
+import {exportScenario} from "@/utils.ts";
+import {useScenario} from "@/hook/useScenario.tsx";
 
-interface NavigationProps {
-    onImport?: () => void
-    onExport?: () => void
-}
+const Navigation = () => {
 
-const Navigation = ({ onImport, onExport }: NavigationProps) => {
+    const { getAllScenarios } = useScenario();
+
+    const handleExportScenarios = () => {
+        exportScenario(getAllScenarios())
+    }
     return (
         <div className="flex items-center justify-between gap-4 mb-10">
             <nav className="flex items-center gap-2">
@@ -43,25 +46,13 @@ const Navigation = ({ onImport, onExport }: NavigationProps) => {
                 </NavLink>
             </nav>
 
-            {/* Action Buttons */}
             <div className="flex items-center gap-2">
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={onImport}
+                    onClick={handleExportScenarios}
                     className="flex items-center gap-2"
-                    disabled
-                >
-                    <Upload className="h-4 w-4" />
-                    Import
-                </Button>
-
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onExport}
-                    className="flex items-center gap-2"
-                    disabled
+                    disabled={getAllScenarios().length === 0}
                 >
                     <Download className="h-4 w-4" />
                     Export
