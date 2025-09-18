@@ -3,7 +3,7 @@ import type {IExecutionLog, IScenario, IStep} from "@/types/types.ts";
 export const getCoreRules = (stepType: string) => {
     switch (stepType) {
         case 'sms':
-            return Math.random() < 0.4 ? 'success' : 'failure';
+            return 'success';
         case 'email':
             return Math.random() < 0.5 ? 'success' : 'failure';
         case 'custom':
