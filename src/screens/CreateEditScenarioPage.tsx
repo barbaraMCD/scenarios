@@ -70,7 +70,6 @@ const CreateEditScenarioPage = () => {
                     s => s.dependsOn === step.name && s.name === step.nextStep
                 );
                 if (!existing) {
-                    // TODO A REVOIR POUR L ENTRETIEN
                     const base = scenario.steps.find(s => s.name === step.nextStep && !s.dependsOn);
                     completeSteps.push({
                         id: Date.now() + Math.random(),
