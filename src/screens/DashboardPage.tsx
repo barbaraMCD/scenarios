@@ -9,11 +9,23 @@ import {useScenario} from "@/hook/useScenario.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useState} from "react";
 import { useNavigate } from 'react-router';
+import type {IScenario} from "@/types/types.ts";
+import {simulateScenario} from "@/utils.ts";
 
 const DashboardPage = () => {
-    const { scenarios } = useScenario();
+    const { scenarios, getScenarioById } = useScenario();
     const navigate = useNavigate();
-    const [selectedScenario, setSelectedScenario] = useState<string | undefined>(undefined);
+    const [selectedScenario, setSelectedScenario] = useState<IScenario | undefined>(undefined);
+
+    const handleSelectedScenario = (scenarioId: string) => {
+        const scenario = getScenarioById(parseInt(scenarioId));
+        setSelectedScenario(scenario);
+    }
+
+    const handleStartScenario = () => {
+        if(!selectedScenario) return;
+        console.log(simulateScenario(selectedScenario!));
+    }
 
     return (
         <TemplatePage>
@@ -55,8 +67,8 @@ const DashboardPage = () => {
 
                 <div className="flex flex-col w-1/2 gap-2 justify-center items-center p-2">
                     <Select
-                        value={selectedScenario}
-                        onValueChange={(value) => setSelectedScenario(value)}
+                        value={selectedScenario?.id.toString()}
+                        onValueChange={(value) => handleSelectedScenario(value)}
                     >
                         <SelectTrigger>
                             <SelectValue placeholder="Choisir un scénario"/>
@@ -69,7 +81,7 @@ const DashboardPage = () => {
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button>
+                    <Button onClick={handleStartScenario} disabled={!selectedScenario}>
                         <p> Start </p>
                     </Button>
                 </div>
